@@ -157,7 +157,7 @@ class Score:
         self.img = self.fonto.render(f"スコア：{self.total_score}", 0, self.color)
         self.center = (100, HEIGHT - 50)
     
-    def update(self, screen):
+    def update(self, screen: pg.Surface):
         """
         スコアを表示
         引数：screen(Surface)
