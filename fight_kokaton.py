@@ -179,15 +179,17 @@ def main():
     clock = pg.time.Clock()
     tmr = 0
     score = Score()
+    multibeam = []
     while True:
         for event in pg.event.get():
             if event.type == pg.QUIT:
                 return
             if event.type == pg.KEYDOWN and event.key == pg.K_SPACE:
                 # スペースキー押下でBeamクラスのインスタンス生成
-                beam = Beam(bird)            
+                beam = Beam(bird)
+                multibeam.append(Beam(bird))         
         screen.blit(bg_img, [0, 0])
-        
+
         for bomb in bombs:
             if bird.rct.colliderect(bomb.rct):
                 # ゲームオーバー時に，こうかとん画像を切り替え，1秒間表示させる
@@ -199,23 +201,29 @@ def main():
                 time.sleep(1)
                 return
         
-        for i, bomb in enumerate(bombs):
-            if beam is not None:
-                if beam.rct.colliderect(bomb.rct):  # ビームが爆弾を打ち落としたら
-                    score.total_score += 1
-                    beam = None
-                    bombs[i] = None
-                    bird.change_img(6, screen)  # コウカトンが喜ぶ画像に切り替え
-                    pg.display.update()
-
+        for i, beam in enumerate(multibeam):
+            for j, bomb in enumerate(bombs):
+                if beam is not None and bomb is not None:
+                    if beam.rct.colliderect(bomb.rct):  # ビームが爆弾を打ち落としたら
+                        score.total_score += 1
+                        multibeam[i] = None
+                        bombs[j] = None
+                        bird.change_img(6, screen)  # コウカトンが喜ぶ画像に切り替え
+                        pg.display.update()
+                    
         key_lst = pg.key.get_pressed()
         bird.update(key_lst, screen)
         bombs = [bomb for bomb in bombs if bomb is not None]  # Noneでないものリスト
         for bomb in bombs:  
             bomb.update(screen)
-        if beam is not None:  # NoneでupdateするとattributeError
+        multibeam = [beam for beam in multibeam if beam is not None]
+        for beam in multibeam:
             beam.update(screen)
-        # bomb2.update(screen)
+        for i, j in enumerate(multibeam):
+            x, y = check_bound(j.rct)
+            if not x or not y:
+                del multibeam[i] 
+        # bomb2.update(screen) 
         score.update(screen)
         pg.display.update()
         tmr += 1
