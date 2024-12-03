@@ -171,6 +171,8 @@ def main():
             if beam.rct.colliderect(bomb.rct):  # ビームが爆弾を打ち落としたら
                 beam = None
                 bomb = None
+                bird.change_img(6, screen)  # コウカトンが喜ぶ画像に切り替え
+                pg.display.update()
 
         key_lst = pg.key.get_pressed()
         bird.update(key_lst, screen)
